@@ -1,0 +1,10 @@
+{
+  "name": "Bottom Left Warm",
+  "description": "Warm dark theme with scattered dots pattern, bottom-left text",
+  "resolution": "3840x2160",
+  "text_position": "bottom-left",
+  "color_scheme_index": 5,
+  "style_category": "dots",
+  "style_name": "scattered"
+}
+

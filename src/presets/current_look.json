@@ -1,0 +1,10 @@
+{
+  "name": "Current Look",
+  "description": "The default dark theme with minimal dot pattern, bottom-left text positioning",
+  "resolution": "3840x2160",
+  "text_position": "bottom-left",
+  "color_scheme_index": 0,
+  "style_category": "patterns",
+  "style_name": "minimal"
+}
+

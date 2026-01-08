@@ -217,16 +217,21 @@ def style_shapes_geometric(img: Image.Image, draw: ImageDraw.Draw) -> None:
 def style_patterns_minimal(img: Image.Image, draw: ImageDraw.Draw) -> None:
     """Minimal repeating pattern."""
     width, height = img.size
-    color_scheme = COLOR_SCHEMES[4]
+    color_scheme = COLOR_SCHEMES[0]  # Use dark gray scheme for consistency
     
-    pattern_size = random.randint(100, 200)
-    element_size = random.randint(3, 8)
+    # Scale pattern size with resolution for consistency
+    scale_factor = min(width / 3840, height / 2160)
+    base_pattern_size = 150
+    base_element_size = 4
+    
+    pattern_size = int(base_pattern_size * scale_factor)
+    element_size = max(2, int(base_element_size * scale_factor))
     
     for x in range(0, width, pattern_size):
         for y in range(0, height, pattern_size):
             if random.random() > 0.7:  # Sparse pattern
-                offset_x = random.randint(-20, 20)
-                offset_y = random.randint(-20, 20)
+                offset_x = random.randint(-int(pattern_size * 0.1), int(pattern_size * 0.1))
+                offset_y = random.randint(-int(pattern_size * 0.1), int(pattern_size * 0.1))
                 bbox = [x + offset_x - element_size, y + offset_y - element_size,
                        x + offset_x + element_size, y + offset_y + element_size]
                 draw.ellipse(bbox, fill=color_scheme.accent)

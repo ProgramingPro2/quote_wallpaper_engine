@@ -1,0 +1,10 @@
+{
+  "name": "Top Right Minimal",
+  "description": "Text positioned top-right with dark blue accent background",
+  "resolution": "3840x2160",
+  "text_position": "top-right",
+  "color_scheme_index": 2,
+  "style_category": "patterns",
+  "style_name": "minimal"
+}
+

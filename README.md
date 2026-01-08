@@ -1,4 +1,4 @@
-# Quote Wallpaper Generator
+# Ubuntu Quote Wallpaper Generator and Cycler
 
 A Python application that generates minimalistic 4K wallpapers from quotes with a dark theme and sparse dot pattern background.
 
@@ -6,11 +6,15 @@ A Python application that generates minimalistic 4K wallpapers from quotes with 
 
 - Generate high-resolution wallpapers (4K default, customizable)
 - Minimalistic design with dark theme
-- Bottom-left text positioning
+- Multiple text positioning options (center, corners)
+- Multiple color schemes and style patterns
 - Batch processing from CSV/JSON files
 - Auto-detection of quote, author, and source/occupation/role fields
 - Automatic numbering by author (e.g., `Steve_Jobs_1.png`, `Steve_Jobs_2.png`)
+- **GUI Wallpaper Generator**: Visual interface for generating wallpapers with presets and configuration
+- **Preset System**: Built-in presets and ability to save/load custom presets
 - **Wallpaper Cycler**: Automatically cycle through generated wallpapers with configurable intervals
+- **Smart Time Tracking**: Catches up on missed cycles when system wakes from sleep
 - **GUI Configuration**: Easy-to-use interface for managing wallpaper cycling settings
 - **Autostart Support**: Configure to start automatically on system login
 
@@ -55,6 +59,51 @@ python src/main.py --input quotes.json --resolution 1920x1080
 ```bash
 python src/main.py --quote "Your quote here" --author "Author Name" --source "Source/Occupation" --number 1
 ```
+
+## GUI Wallpaper Generator
+
+The GUI provides a visual interface for generating wallpapers with full control over all settings.
+
+### Launching the GUI
+
+```bash
+python src/wallpaper_generator_gui.py
+```
+
+### Features
+
+**Single Generation Tab:**
+- Enter quote, author, and optional source
+- Configure resolution, text position, color scheme, and style pattern
+- Preview wallpaper before generating (reduced resolution for speed)
+- Generate full-resolution wallpaper
+- Save current settings as a custom preset
+
+**Batch Processing Tab:**
+- Process CSV/JSON files with the same configuration options
+- Progress status indicator
+- Automatic numbering by author
+
+**Preset Management:**
+- Built-in presets including "Current Look" (default dark theme)
+- Load presets to quickly apply configurations
+- Save custom presets for reuse
+- Presets stored in `~/.config/quote_wallpaper_generator/presets/`
+
+### Built-in Presets
+
+1. **Current Look** - Dark gray background, minimal pattern, bottom-left text
+2. **Center Classic** - Dark blue-gray, minimal pattern, centered text
+3. **Top Right Minimal** - Dark blue accent, minimal pattern, top-right text
+4. **Bottom Left Warm** - Warm dark theme, scattered dots, bottom-left text
+5. **Center Cool Gradient** - Cool dark theme, radial gradient, centered text
+
+### Configuration Options
+
+- **Resolution**: 1920x1080, 2560x1440, 3840x2160, or custom
+- **Text Position**: center, bottom-left, bottom-right, top-left, top-right
+- **Color Scheme**: 7 predefined schemes (dark, light, warm, cool)
+- **Style Pattern**: 10 patterns across 5 categories (dots, lines, gradients, shapes, patterns)
 
 ## Wallpaper Cycler
 
@@ -110,6 +159,13 @@ The cycler supports multiple desktop environments:
 - **Sway**: Uses swaybg
 
 The script auto-detects your desktop environment, or you can set it manually in the config.
+
+### Smart Time Tracking
+
+The cycler tracks the last wallpaper change time and automatically catches up when your system wakes from sleep:
+- If more than the cycle interval has passed, changes wallpaper immediately
+- Then continues with the regular cycle schedule
+- Logs how many cycles were missed for debugging
 
 ### Logs
 
@@ -180,16 +236,23 @@ All wallpapers use:
 ```
 quote_wallpaper_engine/
 ├── src/
-│   ├── main.py                  # CLI entry point for wallpaper generation
-│   ├── quote_parser.py          # CSV/JSON parsing
-│   ├── wallpaper_generator.py  # Core generation logic
-│   ├── styles.py                # Style variations
-│   ├── utils.py                 # Utilities (colors, fonts)
-│   ├── wallpaper_cycler.py      # Wallpaper cycling daemon
-│   └── wallpaper_cycler_gui.py  # GUI configuration interface
-├── output/                      # Generated wallpapers
-├── requirements.txt             # Python dependencies
-└── README.md                    # This file
+│   ├── main.py                      # CLI entry point for wallpaper generation
+│   ├── quote_parser.py              # CSV/JSON parsing
+│   ├── wallpaper_generator.py       # Core generation logic
+│   ├── wallpaper_generator_gui.py   # GUI for wallpaper generation
+│   ├── styles.py                    # Style variations
+│   ├── utils.py                     # Utilities (colors, fonts)
+│   ├── wallpaper_cycler.py          # Wallpaper cycling daemon
+│   ├── wallpaper_cycler_gui.py      # GUI for cycler configuration
+│   └── presets/                     # Built-in preset files
+│       ├── current_look.json
+│       ├── center_classic.json
+│       ├── top_right_minimal.json
+│       ├── bottom_left_warm.json
+│       └── center_cool_gradient.json
+├── output/                          # Generated wallpapers
+├── requirements.txt                 # Python dependencies
+└── README.md                        # This file
 ```
 
 ## Example

@@ -319,6 +319,31 @@ class WallpaperCycler:
             self.observer = None
             self.logger.info("Stopped monitoring directory")
     
+    def _get_last_change_time_file(self) -> Path:
+        """Get path to file storing last wallpaper change time."""
+        config_dir = Path(self.config_path).parent
+        return config_dir / 'last_change_time.txt'
+    
+    def _get_last_change_time(self) -> Optional[float]:
+        """Get the timestamp of the last wallpaper change."""
+        time_file = self._get_last_change_time_file()
+        if time_file.exists():
+            try:
+                with open(time_file, 'r') as f:
+                    return float(f.read().strip())
+            except (ValueError, IOError):
+                return None
+        return None
+    
+    def _save_change_time(self):
+        """Save the current time as the last change time."""
+        time_file = self._get_last_change_time_file()
+        try:
+            with open(time_file, 'w') as f:
+                f.write(str(time.time()))
+        except IOError:
+            pass
+    
     def run(self):
         """Run the wallpaper cycler daemon."""
         self.running = True
@@ -338,27 +363,63 @@ class WallpaperCycler:
         # Start monitoring directory
         self.start_monitoring()
         
-        # Set initial wallpaper
-        if self.wallpapers:
-            self.change_wallpaper()
-        
-        # Main loop
+        # Check if we need to catch up on missed cycles
         cycle_interval = self.config['cycle_interval_minutes'] * 60  # Convert to seconds
+        last_change_time = self._get_last_change_time()
+        current_time = time.time()
         
+        if last_change_time:
+            elapsed = current_time - last_change_time
+            if elapsed >= cycle_interval:
+                # Enough time has passed, change wallpaper immediately
+                cycles_missed = int(elapsed / cycle_interval)
+                self.logger.info(f"System was off/sleeping. {cycles_missed} cycle(s) missed. Changing wallpaper now.")
+                if self.wallpapers:
+                    self.change_wallpaper()
+                    self._save_change_time()
+            else:
+                # Not enough time has passed, wait for the remainder
+                wait_time = cycle_interval - elapsed
+                self.logger.info(f"Last change was {int(elapsed/60)} minutes ago. Waiting {int(wait_time/60)} more minutes.")
+        else:
+            # First run or no previous time recorded, set initial wallpaper
+            if self.wallpapers:
+                self.change_wallpaper()
+                self._save_change_time()
+        
+        # Main loop - check every 5 seconds instead of sleeping for full interval
+        check_interval = 5  # Check every 5 seconds
         try:
             while self.running:
-                time.sleep(cycle_interval)
+                time.sleep(check_interval)
                 
-                if self.running:
-                    # Reload config in case it changed
-                    new_config = self._load_config()
-                    if new_config != self.config:
-                        self.logger.info("Configuration changed, reloading...")
-                        self.config = new_config
-                        cycle_interval = self.config['cycle_interval_minutes'] * 60
-                        self.refresh_wallpaper_list()
-                    
-                    self.change_wallpaper()
+                if not self.running:
+                    break
+                
+                # Reload config in case it changed
+                new_config = self._load_config()
+                if new_config != self.config:
+                    self.logger.info("Configuration changed, reloading...")
+                    self.config = new_config
+                    cycle_interval = self.config['cycle_interval_minutes'] * 60
+                    self.refresh_wallpaper_list()
+                
+                # Check if enough time has passed since last change
+                last_change_time = self._get_last_change_time()
+                if last_change_time:
+                    elapsed = time.time() - last_change_time
+                    if elapsed >= cycle_interval:
+                        # Enough time has passed, change wallpaper
+                        cycles_missed = int(elapsed / cycle_interval)
+                        if cycles_missed > 1:
+                            self.logger.info(f"Detected {cycles_missed} missed cycle(s). Changing wallpaper now.")
+                        self.change_wallpaper()
+                        self._save_change_time()
+                else:
+                    # No previous time recorded, set initial wallpaper
+                    if self.wallpapers:
+                        self.change_wallpaper()
+                        self._save_change_time()
         except KeyboardInterrupt:
             self.logger.info("Received interrupt signal, shutting down...")
         finally:

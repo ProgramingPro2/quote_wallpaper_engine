@@ -1,0 +1,10 @@
+{
+  "name": "Center Classic",
+  "description": "Centered text with dark blue-gray background and minimal pattern",
+  "resolution": "3840x2160",
+  "text_position": "center",
+  "color_scheme_index": 1,
+  "style_category": "patterns",
+  "style_name": "minimal"
+}
+

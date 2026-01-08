@@ -1,0 +1,10 @@
+{
+  "name": "Center Cool Gradient",
+  "description": "Cool dark theme with radial gradient, centered text",
+  "resolution": "3840x2160",
+  "text_position": "center",
+  "color_scheme_index": 6,
+  "style_category": "gradients",
+  "style_name": "radial"
+}
+
